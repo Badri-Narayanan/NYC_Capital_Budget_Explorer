@@ -15,13 +15,24 @@ This handlebar file will be rendered when the following route is hit: GET http:/
     <main>
         <div id="login-form-container">
             <p class="home-page">Sign In to NYC Explorer</p>
+
+            {{#if errorMessage}}
+            <div class="error-message">
+                <strong>Error:</strong> {{errorMessage}}
+            </div>
+            {{/if}}
+
             <form class="form-container" action="/login" method="POST">
-                <input type="text" id="userEmail" name="userEmail" placeholder="E-mail">
-                <input type="password" id="userPassword" name="userPassword" placeholder="Password">
+                <input type="text" id="userEmail" name="userEmail" placeholder="E-mail" required
+                    class="{{#if errorMessage}}input-error{{/if}}">
+                <input type="password" id="userPassword" name="userPassword" placeholder="Password" required
+                    class="{{#if errorMessage}}input-error{{/if}}">
                 <input type="submit" value="Sign In" class="submit-button">
             </form>
+
             <p class="register">Don't have an account? <a href="/register">Register here</a></p>
         </div>
+
         <section class="home-page-background"></section>
     </main>
 </body>

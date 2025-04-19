@@ -1,11 +1,15 @@
 import {static as staticDir} from 'express';
-import projectsRouter    from './projects.js';
+import homeRouter from './home.js';
+import projectsRouter  from './projects.js';
+import userAuthenticationRouter from './userAuthentication.js';
 
 
 const constructorMethod = (app) => {
     
 
-    app.use('/', projectsRouter);
+    app.use('/', homeRouter);
+    app.use('/login', userAuthenticationRouter)
+    app.use('/projects', projectsRouter);
     app.use('/public', staticDir('public'));
     
     app.use('*', (req, res) => {

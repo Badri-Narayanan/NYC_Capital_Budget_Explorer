@@ -85,3 +85,21 @@ h1 {
     background: url('/public/assets/home.jpg') no-repeat center center;
     background-size: cover;
 }
+
+/* Error message styling */
+.error-message {
+    background-color: #ffe0e0;
+    color: #c00;
+    padding: 10px;
+    border: 1px solid #c00;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Highlight inputs with error */
+.input-error {
+    border: 2px solid #c00 !important;
+    background-color: #fff5f5;
+}

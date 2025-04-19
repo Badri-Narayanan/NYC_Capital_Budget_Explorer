@@ -29,3 +29,8 @@ export function enrichData(item) {
     award: item.award ? parseFloat(item.award) : 0
   };
 }
+
+export function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
