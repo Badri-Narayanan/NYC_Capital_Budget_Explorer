@@ -64,7 +64,6 @@ This handlebar file will be rendered when the following route is hit: GET http:/
               <button type="button" id="resetFilters" class="secondary-button">Clear All Filters</button>
             </form>
 
-
             <div class="table-container">
               <div class="table-scroll-container">
               <table id="budgetTable" class="table" >
@@ -146,6 +145,12 @@ This handlebar file will be rendered when the following route is hit: GET http:/
                 {{/each}}
               </select>
 
+              <select id="pieSearchNieghborhood" name="neighborhood" class="input-select">
+                <option value="">All Neighborhood</option>
+                {{#each neighborhoodValues}}
+                <option value="{{this}}" {{#if (eq ../selected.neighborhood this)}}selected{{/if}}>{{this}}</option>
+                {{/each}}
+              </select>
               <input id="pieSearchSponsor" type="text" placeholder="Search Sponsor..." class="input-text"/>
               <button id="pieSearchFilters" class="primary-button">Search</button>
               <button id="pieResetFilters" class="secondary-button">Reset</button>
@@ -153,9 +158,22 @@ This handlebar file will be rendered when the following route is hit: GET http:/
               <div class = "pieDimensions">
               <label for="groupByDropdown">Group By:</label>
               <select id="groupByDropdown" class="input-select">
-                <option value="borough">Borough</option>
-                <option value="reportedYear">Reported Year</option>
+                <option value="borough_full">Borough</option>
+                <option value="reported">Reported Year</option>
                 {{!-- <option value="councilDistrict">Council District</option> --}}
+              </select>
+              <label for="awardRangeSelect">Award Range:</label>
+              <select id="awardRangeSelect" class="input-select">
+                <option value="lt_50000" selected>Less than $50,000</option>
+                <option value="50000_to_74999">$50,000 - $74,999</option>
+                <option value="75000_to_99999">$75,000 - $99,999</option>
+                <option value="100000_to_124999">$100,000 - $124,999</option>
+                <option value="125000_to_149999">$125,000 - $149,999</option>
+                <option value="150000_to_199999">$150,000 - $199,999</option>
+                <option value="200000_to_299999">$200,000 - $299,999</option>
+                <option value="300000_to_499999">$300,000 - $499,999</option>
+                <option value="500000_to_699999">$500,000 - $699,999</option>
+                <option value="699999">Greater than $699,999</option>
               </select>
               </div>
               <canvas id="pieChartCanvas" class="pieChartCanvas" width="400" height="400"></canvas>

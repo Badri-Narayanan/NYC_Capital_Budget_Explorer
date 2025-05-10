@@ -3,19 +3,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const tabContents = document.querySelectorAll(".tab-content");
 
   // ************ NEW TABLE FILTERS AND SEARCH ************
-  document.getElementById('searchFilters').addEventListener('click', () => {
-    const form = document.getElementById('filterForm');
+  document.getElementById("searchFilters").addEventListener("click", () => {
+    const form = document.getElementById("filterForm");
     const params = new URLSearchParams(new FormData(form));
     window.location.href = `/projects?${params.toString()}`;
   });
 
-  document.getElementById('resetFilters').addEventListener('click', () => {
-    document.getElementById('filterForm').reset();
-    window.location.href = '/projects';
+  document.getElementById("resetFilters").addEventListener("click", () => {
+    document.getElementById("filterForm").reset();
+    window.location.href = "/projects";
   });
- // ************ END OF NEW TABLE FILTERS AND SEARCH ************
+  // ************ END OF NEW TABLE FILTERS AND SEARCH ************
 
- // ************* NEW BAR CHART WITH A BAR CHART ROUTE *************
+  // ************* NEW BAR CHART WITH A BAR CHART ROUTE *************
   async function loadBarChart(filters = {}) {
     const params = new URLSearchParams(filters);
 
@@ -24,8 +24,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
-          alert('Session expired. Redirecting to login...');
-          window.location.href = '/login';
+          alert("Session expired. Redirecting to login...");
+          window.location.href = "/login";
           return;
         } else {
           throw new Error(`Server returned ${res.status}`);
@@ -33,24 +33,26 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const data = await res.json();
-      const labels = data.map(d => d.label); // now project IDs
-      const descriptions = data.map(d => d.description);
-      const values = data.map(d => d.value);
-      const boroughs = data.map(d => d.borough);
-      const fiscalYears = data.map(d => d.fiscal_year);
+      const labels = data.map((d) => d.label); // now project IDs
+      const descriptions = data.map((d) => d.description);
+      const values = data.map((d) => d.value);
+      const boroughs = data.map((d) => d.borough);
+      const fiscalYears = data.map((d) => d.fiscal_year);
 
-      const ctx = document.getElementById('barChartCanvas').getContext('2d');
+      const ctx = document.getElementById("barChartCanvas").getContext("2d");
       if (window.barChartInstance) window.barChartInstance.destroy();
 
       window.barChartInstance = new Chart(ctx, {
-        type: 'bar',
+        type: "bar",
         data: {
           labels: labels,
-          datasets: [{
-            label: 'Top 10 Projects by Amount',
-            data: values,
-            backgroundColor: 'rgba(0, 123, 255, 0.6)'
-          }]
+          datasets: [
+            {
+              label: "Top 10 Projects by Amount",
+              data: values,
+              backgroundColor: "rgba(0, 123, 255, 0.6)",
+            },
+          ],
         },
         options: {
           responsive: true,
@@ -60,43 +62,43 @@ document.addEventListener("DOMContentLoaded", () => {
                 title: (tooltipItems) => {
                   const index = tooltipItems[0].dataIndex;
                   return `ID: ${labels[index]}\ndescription: ${descriptions[index]}\nborough: ${boroughs[index]}\nfiscalYear: ${fiscalYears[index]}`;
-                }
-              }
-            }
+                },
+              },
+            },
           },
           scales: {
-              x: {
-                grid: {
-                  display: false  
+            x: {
+              grid: {
+                display: false,
               },
               ticks: {
                 maxRotation: 0,
-                minRotation: 0
-              }
+                minRotation: 0,
+              },
             },
             y: {
               grid: {
-                display: false  
+                display: false,
               },
               beginAtZero: true,
               ticks: {
-                callback: value => '$' + value.toLocaleString()
-              }
-            }
-          }
-        }
+                callback: (value) => "$" + value.toLocaleString(),
+              },
+            },
+          },
+        },
       });
 
-      document.getElementById('noBarDataMessage').style.display = data.length ? 'none' : 'block';
-
+      document.getElementById("noBarDataMessage").style.display = data.length
+        ? "none"
+        : "block";
     } catch (error) {
-      console.error('Error loading bar chart:', error);
-      alert('Could not load chart data. Please try again.');
+      console.error("Error loading bar chart:", error);
+      alert("Could not load chart data. Please try again.");
     }
-}
+  }
 
-
- // ************* END OF NEW BAR CHART WITH A BAR CHART ROUTE *************
+  // ************* END OF NEW BAR CHART WITH A BAR CHART ROUTE *************
 
   // console.log("button clicked");
   tabLinks.forEach((btn) => {
@@ -115,11 +117,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (target === "pieTab") {
-        createPieChart();
+        const selectedAward = document.getElementById("awardRangeSelect").value;
+        getDataByAmountRange(selectedAward);
       }
     });
   });
-
 
   //EXTRACT PROJECT DATA FROM TABLE
   function extractProjectDataFromTable() {
@@ -144,9 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const budgetData = extractProjectDataFromTable();
-  
+  let globalPieData = [];
   let pieChartInstance;
-
 
   function groupBudgetByKey(data, key) {
     const grouped = {};
@@ -156,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!grouped[groupValue]) {
         grouped[groupValue] = 0;
       }
-      grouped[groupValue] += project.amount;
+      grouped[groupValue] += project.award;
     });
 
     return grouped;
@@ -164,65 +165,90 @@ document.addEventListener("DOMContentLoaded", () => {
 
   //BAR CHART
   function createBarChart() {
-      const startYear = parseInt(document.getElementById('yearRangeStart').value);
-      const endYear = parseInt(document.getElementById('yearRangeEnd').value)
-      loadBarChart(); // Load top 10 on page load
+    const startYear = parseInt(document.getElementById("yearRangeStart").value);
+    const endYear = parseInt(document.getElementById("yearRangeEnd").value);
+    loadBarChart(); // Load top 10 on page load
     // ADDING THE BAR CHART FILTERS AND SEARCH
-      document.getElementById('applyBarFilters').addEventListener('click', () => {
-        
-        const startYear_filter = parseInt(document.getElementById('yearRangeStart').value);
-        const endYear_filter = parseInt(document.getElementById('yearRangeEnd').value);
-        const errorSpan = document.getElementById('yearError');
-        const borough = document.getElementById('filterBorough').value;
-        const district = document.getElementById('filterDistrict').value;
-        
+    document.getElementById("applyBarFilters").addEventListener("click", () => {
+      const startYear_filter = parseInt(
+        document.getElementById("yearRangeStart").value
+      );
+      const endYear_filter = parseInt(
+        document.getElementById("yearRangeEnd").value
+      );
+      const errorSpan = document.getElementById("yearError");
+      const borough = document.getElementById("filterBorough").value;
+      const district = document.getElementById("filterDistrict").value;
 
-        if(endYear_filter && startYear_filter && endYear_filter < startYear_filter) {
-          errorSpan.style.display = 'block';
-            return; // Stop search
-          } else {
-            errorSpan.style.display = 'none';
-          }
+      if (
+        endYear_filter &&
+        startYear_filter &&
+        endYear_filter < startYear_filter
+      ) {
+        errorSpan.style.display = "block";
+        return; // Stop search
+      } else {
+        errorSpan.style.display = "none";
+      }
 
-        loadBarChart({  startYear_filter, endYear_filter, borough, district });
-        });
+      loadBarChart({ startYear_filter, endYear_filter, borough, district });
+    });
 
-      // Reset filters and reload full chart
-      document.getElementById('resetBarFilters').addEventListener('click', () => {
-        document.getElementById('yearRangeStart').value = startYear;
-        document.getElementById('yearRangeEnd').value = endYear;
-        document.getElementById('yearRangeDisplay').innerText = `FY${startYear} - FY${endYear}`;
-        document.getElementById('filterBorough').value = '';
-        document.getElementById('filterDistrict').value = '';
-        loadBarChart(); // reload full chart
-      });
-    }
+    // Reset filters and reload full chart
+    document.getElementById("resetBarFilters").addEventListener("click", () => {
+      document.getElementById("yearRangeStart").value = startYear;
+      document.getElementById("yearRangeEnd").value = endYear;
+      document.getElementById(
+        "yearRangeDisplay"
+      ).innerText = `FY${startYear} - FY${endYear}`;
+      document.getElementById("filterBorough").value = "";
+      document.getElementById("filterDistrict").value = "";
+      loadBarChart(); // reload full chart
+    });
+  }
 
-    //******** YEAR RANGE FILTER ******************/
-    function updateYearRangeLabel() {
-      const start = document.getElementById('yearRangeStart').value;
-      const end = document.getElementById('yearRangeEnd').value;
-      document.getElementById('yearRangeDisplay').textContent = `FY${start} - FY${end}`;
-    }
+  //******** YEAR RANGE FILTER ******************/
+  function updateYearRangeLabel() {
+    const start = document.getElementById("yearRangeStart").value;
+    const end = document.getElementById("yearRangeEnd").value;
+    document.getElementById(
+      "yearRangeDisplay"
+    ).textContent = `FY${start} - FY${end}`;
+  }
 
-    document.getElementById('yearRangeStart').addEventListener('input', updateYearRangeLabel);
-    document.getElementById('yearRangeEnd').addEventListener('input', updateYearRangeLabel);
-    //****************** END YEAR RANGE FILTER *********************/
+  document
+    .getElementById("yearRangeStart")
+    .addEventListener("input", updateYearRangeLabel);
+  document
+    .getElementById("yearRangeEnd")
+    .addEventListener("input", updateYearRangeLabel);
+  //****************** END YEAR RANGE FILTER *********************/
 
   document
     .getElementById("groupByDropdown")
-    .addEventListener("change", createPieChart);
+    .addEventListener("change", () => createPieChart(globalPieData));
+
+  const getDataByAmountRange = async function (selectedRange) {
+    try {
+      const res = await fetch(`/projects/byAwardRange?range=${selectedRange}`);
+      const data = await res.json();
+
+      globalPieData = data;
+      createPieChart(data);
+    } catch (err) {
+      console.error("Error fetching award data:", err);
+    }
+  };
+  document
+    .getElementById("awardRangeSelect")
+    .addEventListener("change", async function () {
+      const selectedRange = this.value;
+      await getDataByAmountRange(selectedRange);
+    });
 
   //PIE CHART
-  function createPieChart() {
-    // populateFilterDropdowns();
-    const filtered = filterPieChartData(
-      budgetData,
-      "pieSearchBorough",
-      "pieSearchFy",
-      "pieSearchDistrict",
-      "pieSearchSponsor"
-    );
+  function createPieChart(pieData) {
+    const filtered = filterPieChartData(pieData);
 
     const selectedKey = document.getElementById("groupByDropdown").value;
     const grouped = groupBudgetByKey(filtered, selectedKey);
@@ -352,19 +378,23 @@ document.addEventListener("DOMContentLoaded", () => {
       .getElementById("pieSearchSponsor")
       .value.trim()
       .toLowerCase();
+    const neighborhood = document
+      .getElementById("pieSearchNieghborhood")
+      .value.trim();
 
     return data.filter((project) => {
       return (
-        (!borough || project.borough === borough) &&
-        (!year || project.fiscalYear === year) &&
-        (!district || project.councilDistrict.includes(district)) &&
-        (!sponsor || project.sponsor.toLowerCase().includes(sponsor))
+        (!borough || project.borough_full === borough) &&
+        (!year || project.fiscal_year === year) &&
+        (!district || project.council_district === parseInt(district)) &&
+        (!sponsor || (project.sponsor || "").toLowerCase().includes(sponsor)) &&
+        (!neighborhood || project.neighborhoods.includes(neighborhood))
       );
     });
   }
 
   document.getElementById("pieSearchFilters").addEventListener("click", () => {
-    createPieChart();
+    createPieChart(globalPieData);
   });
 
   document.getElementById("pieResetFilters").addEventListener("click", () => {
@@ -372,6 +402,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("pieSearchFy").value = "";
     document.getElementById("pieSearchDistrict").value = "";
     document.getElementById("pieSearchSponsor").value = "";
-    createPieChart();
+    document.getElementById("pieSearchNieghborhood").value = "";
+    const selectedAward = document.getElementById("awardRangeSelect").value;
+    getDataByAmountRange(selectedAward);
   });
 });
